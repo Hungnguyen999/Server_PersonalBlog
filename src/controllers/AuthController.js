@@ -5,6 +5,8 @@ const User = require('../models/userModel');
 async function signUp(req, res) {
   try {
     const { username, email, password, profilePicture } = req.body;
+
+    console.log("Ngoc huong" + username + " " + password)
     const newUser = new User({ username, email, password, profilePicture });
     await newUser.save();
     res.status(201).json({ message: "User created successfully" });
@@ -16,16 +18,16 @@ async function signUp(req, res) {
 }
 
 // Sign in function
-async function signIn() {
+async function signIn(req, res) {
   try {
     const { username, email, password, profilePicture } = req.body;
-    const existedUser = User.findOne({ username });
-    if (!existedUser) {
+    const existedUser = await User.findOne({ username });
+    if (existedUser == null) {
       return res.status(404).json({ message: "Invalid username or password" });
     }
     else {
-      const matchedPassword = await bcrypt.compare(password, user.password);
-      matchedPassword ? res.status(200).json({ message: "Login successfully" }) : res.status(401).json({ message: "Invalid username or password" });
+      const matchedPassword = await bcrypt.compare(password, existedUser.password);
+      matchedPassword ? res.status(200).json({ message: "Login successfully" }) : res.status(401).json({ message: "Invalid username or password. Please try again" });
     }
   } catch (error) {
     console.log(error);
@@ -33,6 +35,6 @@ async function signIn() {
   }
 }
 
-module.exports = [
+module.exports = {
   signIn, signUp
-];
+};

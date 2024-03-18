@@ -1,8 +1,5 @@
 const mongoose = require("mongoose");
-mongoose.connect('mongodb+srv://nguyenduyhunga7:hungreoA7@cluster0.lzdl89g.mongodb.net/personal_blog', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose.connect('mongodb+srv://nguyenduyhunga7:hungreoA7@cluster0.lzdl89g.mongodb.net/personal_blog')
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
