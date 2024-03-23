@@ -1,12 +1,13 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/userModel');
+const jwt = require('jsonwebtoken');
+require("dotenv").config();
 
 // Sign un function
 async function signUp(req, res) {
   try {
     const { username, email, password, profilePicture } = req.body;
 
-    console.log("Ngoc huong" + username + " " + password)
     const newUser = new User({ username, email, password, profilePicture });
     await newUser.save();
     res.status(201).json({ message: "User created successfully" });
@@ -27,7 +28,17 @@ async function signIn(req, res) {
     }
     else {
       const matchedPassword = await bcrypt.compare(password, existedUser.password);
-      matchedPassword ? res.status(200).json({ message: "Login successfully" }) : res.status(401).json({ message: "Invalid username or password. Please try again" });
+      if (matchedPassword) {
+        const payload = { userId: existedUser._id }; // Include user ID in payload
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+        return res.json({
+          message: 'Login successful',
+          token,
+          user: { username: existedUser.username } // Send limited user info
+        });
+      } else {
+        res.status(401).json({ message: "Invalid username or password. Please try again" });
+      }
     }
   } catch (error) {
     console.log(error);
