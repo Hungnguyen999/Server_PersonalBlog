@@ -6,6 +6,7 @@ const userSchemma = new mongoose.Schema({
   email: { type: String, required: false },
   password: { type: String, required: true },
   profilePicture: { type: String },
+  role: { type: String, required: true }, // 1. Contributor 2. Admin
 }, { timestamps: true, })
 
 userSchemma.pre('save', async function (next) {

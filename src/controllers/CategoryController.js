@@ -2,16 +2,20 @@ const Category = require("../models/categoryModel");
 
 async function createCategory(req, res) {
   try {
-    const { name, parentId } = req.body;
-
+    const { name, parentID, isChild, imagePreview } = req.body;
     // Create a new category document
-    const category = new Category({ name });
+    const category = new Category({ name, isChild, imagePreview });
 
     // If parentId is provided, find the parent category and add the new category as its child
-    if (parentId) {
-      const parentCategory = await Category.findById(parentId);
+    if (parentID) {
+      const parentCategory = await Category.findById(parentID);
+      console.log("parent" + parentCategory);
       if (!parentCategory) {
         return res.status(404).json({ message: 'Parent category not found' });
+      }
+      // Check if parentCategory has children array
+      if (!parentCategory.children) {
+        parentCategory.children = [];
       }
       parentCategory.children.push(category._id);
       await parentCategory.save();
@@ -63,7 +67,8 @@ async function updateCategory(req, res) {
 
 async function getAllCategories(req, res) {
   try {
-    const categories = await Category.find().populate("children");
+    // get parent category and its child
+    const categories = await Category.find({ isChild: false }).populate("children");
     res.status(200).json({ categories });
   } catch (error) {
     console.log("Error while getting all categories");
